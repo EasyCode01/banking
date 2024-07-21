@@ -5,17 +5,10 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-// import Footer from './Footer'
+import Footer from './Footer'
 // import PlaidLink from './PlaidLink'
 
-type UserProps = {
-  user: {
-    firstName: string
-    lastName: string
-  }
-}
-
-const Sidebar = ({ user }: UserProps) => {
+const Sidebar = ({ user }: SiderbarProps) => {
   const pathname = usePathname()
 
   return (
@@ -62,7 +55,7 @@ const Sidebar = ({ user }: UserProps) => {
         {/* <PlaidLink user={user} /> */}
       </nav>
 
-      {/* <Footer user={user} /> */}
+      <Footer user={user} />
     </section>
   )
 }
