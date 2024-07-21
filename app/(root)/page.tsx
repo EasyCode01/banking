@@ -5,12 +5,11 @@ import TotalBalanceBox from '@/components/TotalBalanceBox'
 // import RightSidebar from '@/components/RightSidebar'
 // import TotalBalanceBox from '@/components/TotalBalanceBox'
 // import { getAccount, getAccounts } from '@/lib/actions/bank.actions'
-// import { getLoggedInUser } from '@/lib/actions/user.actions'
+import { getLoggedInUser } from '@/lib/actions/user.actions'
 
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
   // const currentPage = Number(page as string) || 1
-  // const loggedIn = await getLoggedInUser()
-  const loggedIn = { firstName: 'Ezekiel', lastName: 'Oyedijo' }
+  const loggedIn = await getLoggedInUser()
   // const accounts = await getAccounts({
   //   userId: loggedIn.$id,
   // })
@@ -29,7 +28,7 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
           <HeaderBox
             type='greeting'
             title='Welcome'
-            user={loggedIn?.firstName || 'Guest'}
+            user={loggedIn?.name || 'Guest'}
             subtext='Access and manage your account and transactions efficiently.'
           />
 
@@ -48,7 +47,7 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
         />  */}
       </div>
 
-      <RightSidebar user={loggedIn} transactions={[]} banks={[2, 2]} />
+      <RightSidebar user={loggedIn} transactions={[]} banks={[{}, {}]} />
     </section>
   )
 }
