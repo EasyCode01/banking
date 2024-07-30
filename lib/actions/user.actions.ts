@@ -31,9 +31,14 @@ export const getUserInfo = async ({ userId }: getUserInfoProps) => {
       [Query.equal('userId', [userId])]
     )
 
+    // Check if documents array is not empty
+    if (user.documents.length === 0) {
+      throw new Error('User not found')
+    }
+
     return parseStringify(user.documents[0])
   } catch (error) {
-    console.log(error)
+    console.log('Error fetching user info:', error)
   }
 }
 
@@ -42,16 +47,16 @@ export const signIn = async ({ email, password }: signInProps) => {
     const { account } = await createAdminClient()
     const session = await account.createEmailPasswordSession(email, password)
 
-    // cookies().set('appwrite-session', session.secret, {
-    //   path: '/',
-    //   httpOnly: true,
-    //   sameSite: 'strict',
-    //   secure: true,
-    // })
+    cookies().set('appwrite-session', session.secret, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
+    })
 
-    // const user = await getUserInfo({ userId: session.userId })
+    const user = await getUserInfo({ userId: session.userId })
 
-    return parseStringify(session)
+    return parseStringify(user)
   } catch (error) {
     console.error('Error', error)
   }
@@ -104,7 +109,7 @@ export const signUp = async ({ password, ...userData }: SignUpParams) => {
       secure: true,
     })
 
-    return parseStringify(newUserAccount)
+    return parseStringify(newUser)
   } catch (error) {
     console.error('Error', error)
   }
@@ -115,11 +120,11 @@ export async function getLoggedInUser() {
     const { account } = await createSessionClient()
     const result = await account.get()
 
-    // const user = await getUserInfo({ userId: result.$id })
+    const user = await getUserInfo({ userId: result.$id })
 
-    return parseStringify(result)
+    return parseStringify(user)
   } catch (error) {
-    console.log(error)
+    console.log('Error getting logged in user:', error)
     return null
   }
 }

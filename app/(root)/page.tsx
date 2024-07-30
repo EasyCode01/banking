@@ -1,25 +1,32 @@
 import HeaderBox from '@/components/HeaderBox'
 import RightSidebar from '@/components/RightSideBar'
 import TotalBalanceBox from '@/components/TotalBalanceBox'
-// import RecentTransactions from '@/components/RecentTransactions'
-// import RightSidebar from '@/components/RightSidebar'
-// import TotalBalanceBox from '@/components/TotalBalanceBox'
-// import { getAccount, getAccounts } from '@/lib/actions/bank.actions'
+import RecentTransactions from '@/components/RecentTransactions'
+
+import { getAccount, getAccounts } from '@/lib/actions/bank.actions'
 import { getLoggedInUser } from '@/lib/actions/user.actions'
 
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
-  // const currentPage = Number(page as string) || 1
+  const currentPage = Number(page as string) || 1
   const loggedIn = await getLoggedInUser()
-  // const accounts = await getAccounts({
-  //   userId: loggedIn.$id,
-  // })
+  if (!loggedIn || !loggedIn.$id) {
+    throw new Error('Invalid user ID')
+  }
 
-  // if (!accounts) return
+  const user = await getLoggedInUser()
+  if (user.role === 'guest') {
+    throw new Error('User does not have the required permissions.')
+  }
+  const accounts = await getAccounts({
+    userId: loggedIn.$id,
+  })
 
-  // const accountsData = accounts?.data
-  // const appwriteItemId = (id as string) || accountsData[0]?.appwriteItemId
+  if (!accounts) return
 
-  // const account = await getAccount({ appwriteItemId })
+  const accountsData = accounts?.data
+  const appwriteItemId = (id as string) || accountsData[0]?.appwriteItemId
+
+  const account = await getAccount({ appwriteItemId })
 
   return (
     <section className='home'>
@@ -28,26 +35,30 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
           <HeaderBox
             type='greeting'
             title='Welcome'
-            user={loggedIn?.name || 'Guest'}
+            user={loggedIn?.firstName || 'Guest'}
             subtext='Access and manage your account and transactions efficiently.'
           />
 
           <TotalBalanceBox
-            accounts={[]}
-            totalBanks={2}
-            totalCurrentBalance={12000.24}
+            accounts={[accountsData]}
+            totalBanks={accounts?.totalBanks}
+            totalCurrentBalance={accounts?.totalCurrentBalance}
           />
         </header>
 
-        {/* <RecentTransactions
+        <RecentTransactions
           accounts={accountsData}
           transactions={account?.transactions}
           appwriteItemId={appwriteItemId}
           page={currentPage}
-        />  */}
+        />
       </div>
 
-      <RightSidebar user={loggedIn} transactions={[]} banks={[1, 2]} />
+      <RightSidebar
+        user={loggedIn}
+        transactions={accounts?.transactions}
+        banks={accountsData?.slice(0, 2)}
+      />
     </section>
   )
 }
