@@ -31,6 +31,8 @@ export const getUserInfo = async ({ userId }: getUserInfoProps) => {
       [Query.equal('userId', [userId])]
     )
 
+    console.log('useeerrr is found', user, 'end')
+
     // Check if documents array is not empty
     if (user.documents.length === 0) {
       throw new Error('User not found')
@@ -65,12 +67,12 @@ export const signIn = async ({ email, password }: signInProps) => {
 export const signUp = async ({ password, ...userData }: SignUpParams) => {
   const { email, firstName, lastName } = userData
 
-  let newUserAccount
+  // let newUserAccount
 
   try {
     const { account, database } = await createAdminClient()
 
-    newUserAccount = await account.create(
+    const newUserAccount = await account.create(
       ID.unique(),
       email,
       password,
@@ -102,6 +104,8 @@ export const signUp = async ({ password, ...userData }: SignUpParams) => {
 
     const session = await account.createEmailPasswordSession(email, password)
 
+    if (!session) throw new Error('Error creating session now now')
+
     cookies().set('appwrite-session', session.secret, {
       path: '/',
       httpOnly: true,
@@ -119,6 +123,8 @@ export async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient()
     const result = await account.get()
+
+    console.log(result, 'This is from result')
 
     const user = await getUserInfo({ userId: result.$id })
 
@@ -236,7 +242,7 @@ export const exchangePublicToken = async ({
     if (!fundingSourceUrl) throw Error
 
     // Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and shareableId ID
-    await createBankAccount({
+    const waitBanks = await createBankAccount({
       userId: user.$id,
       bankId: itemId,
       accountId: accountData.account_id,
@@ -244,6 +250,12 @@ export const exchangePublicToken = async ({
       fundingSourceUrl,
       shareableId: encryptId(accountData.account_id),
     })
+
+    if (waitBanks) {
+      console.log('BAnks data created', waitBanks)
+    } else {
+      console.log('Banks data not created')
+    }
 
     // Revalidate the path to reflect the changes
     revalidatePath('/')
@@ -263,9 +275,13 @@ export const getBanks = async ({ userId }: getBanksProps) => {
 
     const banks = await database.listDocuments(
       DATABASE_ID!,
-      BANK_COLLECTION_ID!,
-      [Query.equal('userId', [userId])]
+      BANK_COLLECTION_ID!
+      // [Query.equal('userId', [userId])]
     )
+
+    console.log('check now')
+
+    console.log('is bank data available in getBanks', banks)
 
     return parseStringify(banks.documents)
   } catch (error) {
@@ -279,8 +295,8 @@ export const getBank = async ({ documentId }: getBankProps) => {
 
     const bank = await database.listDocuments(
       DATABASE_ID!,
-      BANK_COLLECTION_ID!,
-      [Query.equal('$id', [documentId])]
+      BANK_COLLECTION_ID!
+      // [Query.equal('$id', [documentId])]
     )
 
     return parseStringify(bank.documents[0])

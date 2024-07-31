@@ -21,6 +21,10 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
     userId: loggedIn.$id,
   })
 
+  console.log('accounts', accounts)
+  console.log('accounts', accounts)
+  console.log('accounts', accounts)
+
   if (!accounts) return
 
   const accountsData = accounts?.data

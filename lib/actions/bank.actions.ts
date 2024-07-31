@@ -21,6 +21,8 @@ export const getAccounts = async ({ userId }: getAccountsProps) => {
     // get banks from db
     const banks = await getBanks({ userId })
 
+    console.log('Do we have bank data', banks)
+
     const accounts = await Promise.all(
       banks?.map(async (bank: Bank) => {
         // get each account info from plaid
@@ -68,6 +70,8 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
   try {
     // get bank from db
     const bank = await getBank({ documentId: appwriteItemId })
+
+    console.log('My bank my bank', bank)
 
     // get account info from plaid
     const accountsResponse = await plaidClient.accountsGet({

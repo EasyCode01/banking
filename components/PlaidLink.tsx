@@ -16,6 +16,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
   const router = useRouter()
 
   const [token, setToken] = useState('')
+  console.log(user)
 
   useEffect(() => {
     const getLinkToken = async () => {
@@ -29,10 +30,16 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(
     async (public_token: string) => {
-      await exchangePublicToken({
+      const valueReturned = await exchangePublicToken({
         publicToken: public_token,
         user,
       })
+
+      if (valueReturned) {
+        console.log('Bank data was successfully created ')
+      } else {
+        console.log('It should have created Bank data')
+      }
 
       router.push('/')
     },
